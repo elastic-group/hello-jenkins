@@ -4,6 +4,7 @@ pipeline {
         stage('UnitTest') {
             steps {
                 sh 'mvn clean test -Dtest=DeepLearningUnitTest'
+            }
         }
         stage('TrainingTest') {
             steps {
