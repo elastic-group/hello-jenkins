@@ -1,13 +1,13 @@
 pipeline {
     agent any
     stages {
-        stage('UnitTest') {
+        stage('UnitTest non-master branches') {
             when { not { branch "master" } }
             steps {
                 sh 'mvn clean test -Dtest=DeepLearningUnitTest'
             }
         }
-        stage('TrainingTest') {
+        stage('E2E tests for master or dryrun branches') {
             when {
                 anyOf {
                     expression { env.BRANCH_NAME.contains("master") }
