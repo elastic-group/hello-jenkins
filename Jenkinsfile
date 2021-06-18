@@ -2,18 +2,20 @@ pipeline {
     agent any
     stages {
         stage('UnitTest') {
+            when { not { branch "master" } }
             steps {
                 sh 'mvn clean test -Dtest=DeepLearningUnitTest'
             }
         }
         stage('TrainingTest') {
-            steps {
-                sh 'mvn clean test -Dtest=DeepLearningTrainingTest'
+            when {
+                anyOf {
+                    expression { env.BRANCH_NAME.contains("master") }
+                    expression { env.BRANCH_NAME.contains("dryrun") }
+                }
             }
-        }
-        stage('PredictTest') {
             steps {
-                sh 'mvn clean test -Dtest=DeepLearningPredictTest'
+                sh 'mvn clean test -Dtest=DeepLearningTrainingTest,DeepLearningPredictTest'
             }
         }
     }
