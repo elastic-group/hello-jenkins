@@ -1,13 +1,18 @@
 pipeline {
     agent any
     stages {
-        stage('Build') {
+        stage('UnitTest') {
             steps {
-                sh 'mvn clean test'
-                sh '''
-                    echo "Multiline shell steps works too"
-                    ls -lah
-                '''
+                sh 'mvn clean test -Dtest=DeepLearningUnitTest'
+        }
+        stage('TrainingTest') {
+            steps {
+                sh 'mvn clean test -Dtest=DeepLearningTrainingTest'
+            }
+        }
+        stage('PredictTest') {
+            steps {
+                sh 'mvn clean test -Dtest=DeepLearningPredictTest'
             }
         }
     }
