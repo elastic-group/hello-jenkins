@@ -1,5 +1,10 @@
 pipeline {
     agent any
+    parameters {
+        choice(name: "AlwaysUse", choices: "global_common.properties", description: "Global common properties")
+        choice(name: "TestAction", choices: ["STOP_IF_FAILED", "SKIP_TESTS", "IGNORE_FAILURES"], description: "Action to perform for tests")
+    }
+
     stages {
         stage('UnitTest non-master branches') {
             when { not { branch "main" } }
