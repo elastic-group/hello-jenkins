@@ -7,13 +7,13 @@ pipeline {
     }
 
     stages {
-        stage('UnitTest non-master branches') {
+        stage('UnitTest only non-master branches') {
             when { not { branch "main" } }
             steps {
                 sh 'mvn clean test -Dtest=DeepLearningUnitTest'
             }
         }
-        stage('E2E tests for master or dryrun branches') {
+        stage('E2E tests only(not unit tests) for master or dryrun branches') {
             when {
                 anyOf {
                     expression { env.BRANCH_NAME.contains("main") }
@@ -22,6 +22,17 @@ pipeline {
             }
             steps {
                 sh 'mvn clean test -Dtest=DeepLearningTrainingTest,DeepLearningPredictTest'
+            }
+        }
+        stage("Run tests PredictTest only") {
+            when {
+                anyOf {
+                    not { expression { env.BRANCH_NAME.contains("master") } }
+                    not { expression { env.BRANCH_NAME.contains("dryrun") } }
+                }
+            }
+            steps {
+                sh 'mvn clean test -Dtest=DeepLearningPredictTest'
             }
         }
     }
