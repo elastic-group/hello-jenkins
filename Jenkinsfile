@@ -1,44 +1,20 @@
 pipeline {
     agent any
-    parameters {
-        string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
-        text(name: 'BIOGRAPHY', defaultValue: '', description: 'Enter some information about the person')
-        booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
-        choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
-        password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
-
-        choice(name: "AlwaysUse", choices: "global_common.properties", description: "Global common properties")
-        choice(name: "TestAction", choices: ["STOP_IF_FAILED", "SKIP_TESTS", "IGNORE_FAILURES"], description: "Action to perform for tests")
-        string(name: "MaxPollTimes", defaultValue: "3", description: "Max number of times to retry")
-    }
-
     stages {
-        stage('UnitTest only non-master branches') {
+        stage('UnitTest non-master branches') {
             when { not { branch "main" } }
             steps {
                 sh 'mvn clean test -Dtest=DeepLearningUnitTest'
             }
         }
-        stage('E2E tests only(not unit tests) for master or dryrun branches') {
+        stage('E2E tests for master or dryrun branches') {
             when {
-                anyOf {
-                    expression { env.BRANCH_NAME.contains("main") }
-                    expression { env.BRANCH_NAME.contains("dryrun") }
-                }
+                expression { env.BRANCH_NAME.contains("main") }
             }
             steps {
-                sh 'mvn clean test -Dtest=DeepLearningTrainingTest,DeepLearningPredictTest'
-            }
-        }
-        stage("Run tests PredictTest only") {
-            when {
-                anyOf {
-                    not { expression { env.BRANCH_NAME.contains("master") } }
-                    not { expression { env.BRANCH_NAME.contains("dryrun") } }
-                }
-            }
-            steps {
-                sh 'mvn clean test -Dtest=DeepLearningPredictTest'
+                sh 'echo "Executing a failing test"'
+                sh 'mvn clean test -Dtest=FailingTest'
+                sh 'echo "Status was a non zero value"'
             }
         }
     }
